@@ -7,6 +7,8 @@ module.exports = {
         origin: process.env.CLIENT,
         methods: ["GET", "POST"],
       },
+    }), (httpServer, {
+      maxHttpBufferSize: 100 * 1024 * 1024, // Set to 100 MB (adjust as needed)
     });
     return io;
   },

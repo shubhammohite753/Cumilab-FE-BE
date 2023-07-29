@@ -1,31 +1,19 @@
 const multer = require("multer");
 const HttpError = require("../http-error");
+const path = require("path");
 
-const MIME_TYPE_MAP = {
-  "image/png": "png",
-  "image/jpeg": "jpeg",
-  "image/jpg": "jpg",
-};
-
-const fileUpload = multer({
-  limits: 500000,
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/images");
-    },
-    filename: (req, file, cb) => {
-      const ext = MIME_TYPE_MAP[file.mimetype];
-      cb(
-        null,
-        new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
-      );
-    },
-  }),
-  fileFilter: (req, file, cb) => {
-    const isValid = !!MIME_TYPE_MAP[file.mimetype];
-    let error = isValid ? null : new HttpError("Invalid type", 500);
-    cb(error, isValid);
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/images'); // Destination folder for uploaded files
   },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const extname = path.extname(file.originalname);
+    const filename = file.fieldname + '-' + uniqueSuffix + extname;
+    cb(null, filename);
+  }
 });
+const upload = multer({ storage: storage });
 
-module.exports = fileUpload;
+
+module.exports = upload;

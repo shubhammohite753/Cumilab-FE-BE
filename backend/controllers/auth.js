@@ -143,7 +143,6 @@ exports.login = async (req, res, next) => {
 
   res.json({
     token,
-    redirect:"/dashboard"
   });
 };
 

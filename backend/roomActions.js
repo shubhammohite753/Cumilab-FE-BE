@@ -5,7 +5,9 @@ const cloudinary = require("cloudinary").v2;
 const Conversation = require("./models/conversation");
 const User = require("./models/user");
 const HttpError = require("./http-error");
-
+const fs = require("fs");
+const path = require("path");
+const upload = require("./middlewares/file-upload");
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -15,6 +17,13 @@ cloudinary.config({
 // const { MONTH, isToday, isYesterday } = require("./utils");
 
 const users = [];
+
+
+
+
+// Function to save the file to the server
+async function saveFile(data, fileName, file) {
+}
 
 
 const decodeToken = (token) => {
@@ -304,21 +313,48 @@ const updateConversation = async (socketId, message) => {
       date,
     };
   } else {
-    await cloudinary.uploader.upload(message.file, (error, image) => {
-      if (error) {
-        console.log(error);
-      } else {
-        media = image.secure_url;
+    // const filePath = saveFile(,);
+    const UPLOADS_DIR = path.join('uploads', 'Projects', 'sanket');
 
-        newMessageToAdd = {
-          message: image.secure_url,
-          sender: new ObjectId(user.id),
-          receiver: new ObjectId(user.currPage.otherId),
-          date,
-          image: true,
-        };
+    // Create the uploads directory if it doesn't exist
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      try {
+        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+      } catch (err) {
+        console.error('Error creating directory:', err);
+        return;
+      }
+    }
+
+
+    // Create a Buffer from the ArrayBuffer data
+    const buffer = await Buffer.from(message.file);
+    console.log("buffer created:", buffer);
+    // Save the file to the uploads folder
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const extname = path.extname(message.fileName);
+    const filename = 'file' + '-' + uniqueSuffix + extname;
+    const filePath = path.join(UPLOADS_DIR, filename);
+    fs.writeFile(filePath, buffer, (err) => {
+      if (err) {
+        console.error('Error saving the file:', err);
+      } else {
+        console.log('File saved successfully:', message.fileName);
       }
     });
+    newMessageToAdd = {
+      message: filePath,
+      sender: new ObjectId(user.id),
+      receiver: new ObjectId(user.currPage.otherId),
+      date,
+      image: true,
+      file: {
+        isFile: true,
+        filePath: filePath,
+        fileName: message.fileName,
+        extName: extname
+      }
+    };
   }
 
   try {

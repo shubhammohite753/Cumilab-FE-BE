@@ -14,6 +14,11 @@ const projectSchema = new Schema({
         type: String,
         default: '../uploads/'
     },
+    projectadmin: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: "User",
+    },
     users: [
         {
             type: mongoose.Types.ObjectId,

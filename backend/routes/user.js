@@ -3,7 +3,7 @@ const router = express.Router();
 
 const userControllers = require("../controllers/user");
 const isAuth = require("../middlewares/is-auth");
-const fileUpload = require("../middlewares/file-upload");
+const upload = require("../middlewares/file-upload");
 
 router.get("/profile", isAuth, userControllers.getProfile);
 
@@ -28,7 +28,7 @@ router.get(
 router.post(
   "/avatar",
   isAuth,
-  fileUpload.single("image"),
+  upload.single("image"),
   userControllers.avatar
 );
 

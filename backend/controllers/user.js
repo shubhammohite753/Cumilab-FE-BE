@@ -765,27 +765,27 @@ exports.getConversation = async (req, res, next) => {
 };
 
 exports.avatar = async (req, res, next) => {
-  let media;
+  // let media;
 
-  await cloudinary.uploader.upload(
-    req.file.path,
-    { width: 200, height: 200, gravity: "face", crop: "thumb" },
-    (err, image) => {
-      if (err) {
-        const error = new HttpError("Could not update avatar", 500);
-        return next(error);
-      }
-      fs.unlinkSync(req.file.path);
-      // res.json(image);
-      media = image.secure_url;
-    }
-  );
+  // await cloudinary.uploader.upload(
+  //   req.file.path,
+  //   { width: 200, height: 200, gravity: "face", crop: "thumb" },
+  //   (err, image) => {
+  //     if (err) {
+  //       const error = new HttpError("Could not update avatar", 500);
+  //       return next(error);
+  //     }
+  //     fs.unlinkSync(req.file.path);
+  //     // res.json(image);
+  //     media = image.secure_url;
+  //   }
+  // );
 
   let user;
   try {
     user = await User.updateOne(
       { _id: req.userId },
-      { $set: { avatar: media } },
+      { $set: { avatar: req.file.path } },
       { upsert: true }
     );
   } catch (err) {
@@ -797,7 +797,7 @@ exports.avatar = async (req, res, next) => {
     throw new Error("Could not update avatar #b");
   }
 
-  res.status(201).json({ avatar: media });
+  res.status(201).json({ avatar: req.file.path });
 };
 
 exports.deleteAvatar = async (req, res, next) => {

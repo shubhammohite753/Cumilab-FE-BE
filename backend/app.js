@@ -24,10 +24,11 @@ const MONGODB_URI = process.env.DB_USER;
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
+app.use("/uploads/Projects", express.static(path.join("uploads", "Projects")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", process.env.ACCESS);

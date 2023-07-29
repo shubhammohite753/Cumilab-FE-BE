@@ -19,6 +19,12 @@ const convoSchema = new Schema({
       receiver: { type: Schema.Types.ObjectId, ref: "User", required: true },
       date: { type: Date },
       image: { type: Boolean, default: false },
+      file: {
+        isFile: { type: Boolean, default: false },
+        filePath: { type: String },
+        fileName: { type: String },
+        extName: { type: String }
+      }
     },
   ],
   users: [
