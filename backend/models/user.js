@@ -14,16 +14,15 @@ const userSchema = new Schema({
     unique: true,
     lowercase: true,
   },
+  mobileNo:{
+    type: String,
+    required: true,
+
+  },
   password: {
     type: String,
     required: true,
     minlength: 6,
-  },
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
   },
   avatar: {
     type: String,

@@ -9,15 +9,15 @@ const TokenBl = require("../models/tokenbl");
 const HttpError = require("../http-error");
 
 exports.signup = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new HttpError(
-      "Validation failed, entered data is incorrect",
-      422
-    );
-    return next(error);
-  }
-  const { name, email, password, username } = req.body;
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   const error = new HttpError(
+  //     "Validation failed, entered data is incorrect"+ {...errors},
+  //     422
+  //   );
+  //   return next(error);
+  // }
+  const { name, email, password, mobileNo } = req.body;
 
   let existingUser;
 
@@ -33,20 +33,6 @@ exports.signup = async (req, res, next) => {
     return next(error);
   }
 
-  try {
-    existingUserName = await User.findOne({ username })
-      .select({ username: 1 })
-      .lean();
-  } catch (err) {
-    const error = new HttpError("Signing up failed #aa", 500);
-    return next(error);
-  }
-
-  if (existingUserName) {
-    const error = new HttpError("Username exists already", 422);
-    return next(error);
-  }
-
   let hashedPassword;
   try {
     hashedPassword = await bcrypt.hash(password, 12);
@@ -59,13 +45,13 @@ exports.signup = async (req, res, next) => {
     name,
     email,
     password: hashedPassword,
-    username,
+    mobileNo,
   });
 
   try {
     await newUser.save();
   } catch (err) {
-    const error = new HttpError("Signing up failed #b", 500);
+    const error = new HttpError("Signing up failed #b"+err, 500);
     return next(error);
   }
 
@@ -82,6 +68,7 @@ exports.signup = async (req, res, next) => {
 
   res.status(201).json({
     token,
+    redirect:'/'
   });
 };
 
